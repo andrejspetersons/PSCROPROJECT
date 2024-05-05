@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34607.119
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server API", "Server API\Server API.csproj", "{888AF9E5-F71E-4AA3-8C16-51AECFC79A7A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P&K accounting", "P&K accounting\P&K accounting.csproj", "{CB809961-8C26-403B-BFB0-07F4AC5F24D3}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "P&K payment", "P&K payment\", "{78CFDA32-D746-4C79-AA75-BD2CAC017182}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.8"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_54668"
+		Debug.AspNetCompiler.PhysicalPath = "P&K payment\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_54668\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_54668"
+		Release.AspNetCompiler.PhysicalPath = "P&K payment\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_54668\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "54668"
+		SlnRelativePath = "P&K payment\"
+		DefaultWebSiteLanguage = "Visual C#"
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{888AF9E5-F71E-4AA3-8C16-51AECFC79A7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{888AF9E5-F71E-4AA3-8C16-51AECFC79A7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{888AF9E5-F71E-4AA3-8C16-51AECFC79A7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{888AF9E5-F71E-4AA3-8C16-51AECFC79A7A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CB809961-8C26-403B-BFB0-07F4AC5F24D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CB809961-8C26-403B-BFB0-07F4AC5F24D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CB809961-8C26-403B-BFB0-07F4AC5F24D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CB809961-8C26-403B-BFB0-07F4AC5F24D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78CFDA32-D746-4C79-AA75-BD2CAC017182}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78CFDA32-D746-4C79-AA75-BD2CAC017182}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78CFDA32-D746-4C79-AA75-BD2CAC017182}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{78CFDA32-D746-4C79-AA75-BD2CAC017182}.Release|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7F123748-F505-4570-9A93-CE5861C8AC72}
+	EndGlobalSection
+EndGlobal
