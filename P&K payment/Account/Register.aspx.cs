@@ -3,12 +3,45 @@ using System;
 using System.Linq;
 using System.Web.UI;
 using P_K_payment;
+using Newtonsoft.Json;
+using System.Web;
+using System.Net.Http;
+using System.Text;
+using System.ServiceModel.Channels;
 
 public partial class Account_Register : Page
 {
-    protected void CreateUser_Click(object sender, EventArgs e)
+    protected async void CreateUser_Click(object sender, EventArgs e)
     {
-        var manager = new UserManager();
+        ClientViewModel client = new ClientViewModel();
+        client.FirstName = Name.Text;
+        client.LastName = LastName.Text;
+        client.Login = Login.Text;
+        client.Phone = PhoneNumber.Text;
+        client.Email = Email.Text;
+
+        string jsonData = JsonConvert.SerializeObject(client);
+        using(HttpClient httpClient=new HttpClient())
+        {
+            StringContent content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+            try
+            {
+                HttpResponseMessage response = await httpClient.PostAsync("http://localhost:5239/register", content);
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Ok");
+                    Response.Redirect("UserPage.aspx");
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("HERE IS THE ERROR"+ex.StackTrace);
+            }
+        }
+
+
+
+        /*var manager = new UserManager();
         var user = new ApplicationUser() { UserName = UserName.Text };
         IdentityResult result = manager.Create(user, Password.Text);
         if (result.Succeeded)
@@ -19,6 +52,12 @@ public partial class Account_Register : Page
         else
         {
             ErrorMessage.Text = result.Errors.FirstOrDefault();
-        }
+        }*/
+
+    }
+
+    public override void VerifyRenderingInServerForm(Control control)
+    {
+
     }
 }

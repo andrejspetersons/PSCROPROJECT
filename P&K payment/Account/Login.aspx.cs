@@ -4,10 +4,13 @@ using System;
 using System.Web;
 using System.Web.UI;
 using P_K_payment;
+using Newtonsoft.Json;
+using System.Net.Http;
+using System.Text;
 
 public partial class Account_Login : Page
 {
-        protected void Page_Load(object sender, EventArgs e)
+       /* protected void Page_Load(object sender, EventArgs e)
         {
             RegisterHyperLink.NavigateUrl = "Register";
             OpenAuthLogin.ReturnUrl = Request.QueryString["ReturnUrl"];
@@ -16,25 +19,33 @@ public partial class Account_Login : Page
             {
                 RegisterHyperLink.NavigateUrl += "?ReturnUrl=" + returnUrl;
             }
-        }
+        }*/
 
-        protected void LogIn(object sender, EventArgs e)
+    protected async void LogIn(object sender, EventArgs e)
+    {
+        UserLoginViewModel userlog = new UserLoginViewModel();
+        userlog.UserName = UserName.Text;
+
+        string jsonData = JsonConvert.SerializeObject(userlog);
+        
+
+        using (HttpClient httpClient=HttpClientFactory.CreateClient())
         {
-            if (IsValid)
+            StringContent content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+            try
             {
-                // Validate the user password
-                var manager = new UserManager();
-                ApplicationUser user = manager.Find(UserName.Text, Password.Text);
-                if (user != null)
+            HttpResponseMessage response = await httpClient.PostAsync("http://localhost:5239/login", content);
+                if (response.IsSuccessStatusCode)
                 {
-                    IdentityHelper.SignIn(manager, user, RememberMe.Checked);
-                    IdentityHelper.RedirectToReturnUrl(Request.QueryString["ReturnUrl"], Response);
-                }
-                else
-                {
-                    FailureText.Text = "Invalid username or password.";
-                    ErrorMessage.Visible = true;
+                    HttpContext.Current.Session.Add("UserName", UserName.Text);
+                    Response.Redirect("UserPage.aspx");    
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine("HERE IS THE ERROR" + ex.StackTrace);
+            }
         }
+    }
+
 }
