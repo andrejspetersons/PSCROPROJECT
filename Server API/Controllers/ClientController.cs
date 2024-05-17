@@ -1,47 +1,61 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Server_API.Context;
-using Server_API.Models.Entity;
-using Server_API.Models.WebFormsModels;
+﻿using Microsoft.AspNetCore.Mvc;
+using Server_API.Services.AccountantService;
+using Server_API.Services.UserService;
 
 namespace Server_API.Controllers
 {
     public class ClientController : Controller
     {
-        private readonly PSICRODbContext _context;
-        private readonly IMapper _mapper;
-        
-        public ClientController(PSICRODbContext context, IMapper mapper)
+        private readonly IUserService _userservice;
+        private readonly IAccountantService _accountantservice;
+
+        public ClientController(IUserService userservice, IAccountantService accountantservice)
         {
-            _context = context;
-            _mapper = mapper;
+            _userservice = userservice;
+            _accountantservice = accountantservice;
         }
 
         [HttpGet]
-        [Route("payment/{username}")]
+        [Route("paymentbills/{username}")]
         public IActionResult GetClientPaymentBills(string username)
         {
-            var client = _context.Clients.FirstOrDefault(client => client.Login == username);
-            var service = _context.CompanyServices.Where(service => service.Id == 1).FirstOrDefault();
-            if (client != null)
-            {
-                var id = client.Id;
-                var clientBills = _context.PaymentBills
-                    .Where(bill => bill.Client.Id == id && bill.Service.Id == 1)
-                    .Where(service => service.Service.Id == 1).ToList();
-
-                
-                return Ok(MapToPVMList(clientBills));
-
-
+            var clientBills = _userservice.GetClientPaymentBills(username);
+            if (clientBills.Count>0)
+            {              
+                return Ok(clientBills);
             }
-            return NotFound();
+
+            return NoContent();        
         }
 
-        public IEnumerable<PaymentBillViewModel> MapToPVMList(IEnumerable<PaymentBill> paymentBills)
+        [HttpPut]
+        [Route("paybill/{id}")]
+        public IActionResult PayTheBill(int id)
         {
-            return paymentBills.Select(paymentBill => _mapper.Map<PaymentBillViewModel>(paymentBill));
+            if (_userservice.PayTheBill(id))
+            {
+                return Ok();
+            }
+            else
+            {
+                return NotFound();
+            }
         }
+
+        [HttpGet]
+        [Route("clients")]
+        public IActionResult GetAllClients()
+        {
+            var result = _accountantservice.GetAllClients();
+            if (result.Count > 0)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return NoContent();
+            }
+        }
+
     }
 }

@@ -1,29 +1,27 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Server_API.Context;
-using Server_API.Models.WebFormsModels;
+using Server_API.Services.UserService;
 
 namespace Server_API.Controllers
 {
     public class UserLoginController : Controller
     {
-        private readonly PSICRODbContext _context;
-        public UserLoginController(PSICRODbContext context)
+        private readonly IUserService _userservice;
+        public UserLoginController(IUserService userservice)
         {
-            _context = context;    
+            _userservice = userservice;
         }
 
         [HttpPost]
         [Route("login")]
-        public IActionResult Login([FromBody]UserLoginViewModel userlogin)
+        public IActionResult Login([FromBody]string username)
         {
-            var result = _context.Clients.FirstOrDefault(client => client.Login == userlogin.UserName);
-            if (result == null)
+            if (_userservice.isLoggedIn(username))
             {
-                return NotFound(result);
+                return Ok();
             }
             else
             {
-                return Ok(result);
+                return NotFound();
             }
         }
     }

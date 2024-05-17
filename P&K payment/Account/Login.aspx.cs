@@ -10,42 +10,33 @@ using System.Text;
 
 public partial class Account_Login : Page
 {
-       /* protected void Page_Load(object sender, EventArgs e)
-        {
-            RegisterHyperLink.NavigateUrl = "Register";
-            OpenAuthLogin.ReturnUrl = Request.QueryString["ReturnUrl"];
-            var returnUrl = HttpUtility.UrlEncode(Request.QueryString["ReturnUrl"]);
-            if (!String.IsNullOrEmpty(returnUrl))
-            {
-                RegisterHyperLink.NavigateUrl += "?ReturnUrl=" + returnUrl;
-            }
-        }*/
+    private readonly HttpService _httpservice;
+
+    public Account_Login()
+    {
+        _httpservice = new HttpService();
+    }
 
     protected async void LogIn(object sender, EventArgs e)
     {
-        UserLoginViewModel userlog = new UserLoginViewModel();
-        userlog.UserName = UserName.Text;
+        string username = UserNameTextBox.Text;
 
-        string jsonData = JsonConvert.SerializeObject(userlog);
-        
+        string jsonData = JsonConvert.SerializeObject(username);
 
-        using (HttpClient httpClient=HttpClientFactory.CreateClient())
+        StringContent content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+        try
         {
-            StringContent content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-            try
+            HttpResponseMessage response = await _httpservice.LoginRespone("http://localhost:5239/login", content);
+            if (response.IsSuccessStatusCode)
             {
-            HttpResponseMessage response = await httpClient.PostAsync("http://localhost:5239/login", content);
-                if (response.IsSuccessStatusCode)
-                {
-                    HttpContext.Current.Session.Add("UserName", UserName.Text);
-                    Response.Redirect("UserPage.aspx");    
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("HERE IS THE ERROR" + ex.StackTrace);
+                HttpContext.Current.Session.Add("UserName", username);
+                Response.Redirect("UserPage.aspx");
             }
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine("HERE IS THE ERROR" + ex.StackTrace);
+        }
     }
-
 }
+    

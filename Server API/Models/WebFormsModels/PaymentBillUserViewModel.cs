@@ -1,10 +1,9 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-
+﻿
 namespace Server_API.Models.WebFormsModels
 {
-    public class PaymentBillViewModel
+    public class PaymentBillUserViewModel
     {
+        public int PaymentBillId { get; set; }
         public string ServiceName { get; set; }
         public decimal Amount { get; set; }
         public DateTime IssueDate { get; set; }
@@ -12,6 +11,5 @@ namespace Server_API.Models.WebFormsModels
         public DateTime? PaymentDate { get; set; }
         public int? PaymentReceipt { get; set; }
         public string PaymentStatus { get; set; }
-        //represents the shape of GridView record in ASP.NET WEB FORMS
     }
 }

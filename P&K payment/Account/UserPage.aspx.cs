@@ -1,18 +1,22 @@
-﻿using Microsoft.Win32;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
-using System.Activities;
+using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
 using System.Net.Http;
 using System.Text;
-using System.Text.Json;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
 public partial class Account_UserPage : Page
 {
+    private readonly HttpService _httpservice;
+
+    public Account_UserPage()
+    {
+        _httpservice = new HttpService();    
+    }
+
     protected async void Page_Load(object sender, EventArgs e)
     {
         if (!IsPostBack)
@@ -22,7 +26,7 @@ public partial class Account_UserPage : Page
             {
                 Greeting.InnerText = "Hello, " + username+"!";
                 BindGrid();
-
+                
             }
             
         }
@@ -39,41 +43,21 @@ public partial class Account_UserPage : Page
         }
     }
 
-    private void BindGrid()
+    private async void BindGrid()
     {
-        string connectionString = "Data Source=.;Initial Catalog=PSI_CRO_DB;Integrated Security=True;";
-        using (SqlConnection con=new SqlConnection(connectionString))
+        using (HttpClient httpClient=HttpClientFactory.CreateClient())
         {
-            using(SqlCommand cmd=new SqlCommand
-            (
-                "SELECT s.Name AS ServiceName,"+
-                "pb.Id AS PaymentBillId,"+
-                "pb.Amount AS Amount,"+
-                "pb.IssueDate AS IssueDate,"+
-                "pb.DueToDate AS DueToDate,"+
-                "pb.PaymentDate AS PaymentDate,"+
-                "pb.PaymentReceipt AS PaymentReceipt,"+
-                "pb.PaymentStatus AS PaymentStatus "+
-                "FROM PaymentBills pb "+
-                "JOIN CompanyServices s ON pb.ServiceId = s.Id"
-                )
-            )
+            HttpResponseMessage response = await _httpservice.GetPaymentBills($"http://localhost:5239/paymentbills/{Session["UserName"]}");
+            
+            if (response.IsSuccessStatusCode)
             {
-                using (SqlDataAdapter sda = new SqlDataAdapter())
-                {
-                    cmd.Connection = con;
-                    sda.SelectCommand = cmd;
-                    using(DataTable dt=new DataTable())
-                    {
-                        sda.Fill(dt);
-                        PaymentBill.DataSource = dt;
-                        PaymentBill.DataBind();
-                        
-                    }
-                }
-            }
+                string content = await response.Content.ReadAsStringAsync();
+                var paymentBillList = JsonConvert.DeserializeObject<List<PaymentBillUserViewModel>>(content);
+                PaymentBill.DataSource = paymentBillList;
+                PaymentBill.DataBind();
                 
-        }
+            }
+        }  
     }
 
     protected void OnRowDataBound(object sender,GridViewRowEventArgs e)
@@ -99,36 +83,31 @@ public partial class Account_UserPage : Page
         BindGrid();
     }
 
-    protected void OnRowUpdating(object sender,GridViewUpdateEventArgs e)
+    protected async void OnRowUpdating(object sender,GridViewUpdateEventArgs e)
     {
         GridViewRow row = PaymentBill.Rows[e.RowIndex];
         int id = Convert.ToInt32(PaymentBill.DataKeys[e.RowIndex].Values[0]);
-        int test = row.Cells.Count;
         int receipt = Convert.ToInt32((row.Cells[7].Controls[0] as TextBox).Text);
-
-        string connectionString = "Data Source=.;Initial Catalog=PSI_CRO_DB;Integrated Security=True;";
-
+        string jsonData = JsonConvert.SerializeObject(receipt);
+        StringContent content = new StringContent(jsonData, Encoding.UTF8, "application/json");
         try
         {
-            using (SqlConnection con = new SqlConnection(connectionString))
+            HttpResponseMessage response = await _httpservice.UpdateReceipt($"http://localhost:5239/updatereceipt/{id}", content);
+            if (response.IsSuccessStatusCode)
             {
-                using (SqlCommand cmd = new SqlCommand("UPDATE PaymentBills SET PaymentReceipt=@receipt WHERE Id=@paymentbillId",con))
-                {
-                    cmd.Parameters.AddWithValue("@paymentbillId", id);
-                    cmd.Parameters.AddWithValue("@receipt", receipt);
-                    con.Open();                
-                    cmd.ExecuteNonQuery();
-                }
+                Console.WriteLine("Good");
+            }
+            else
+            {
+                Console.WriteLine("Not Good");
             }
 
-            BindGrid();
         }
         catch (Exception ex)
         {
-           
+            Console.WriteLine("HERE IS THE ERROR" + ex.StackTrace);
         }
-        
-
+        BindGrid();
     }
 
     protected void OnRowCancelEdit(object sender, GridViewCancelEditEventArgs e)
@@ -142,27 +121,34 @@ public partial class Account_UserPage : Page
         if (e.CommandName == "PayBill")
         {
             string argument = e.CommandArgument.ToString();
-            string[] arguments = argument.Split(',');
-            int paymentBillId = Convert.ToInt32(arguments[0]);
-            int receipt = Convert.ToInt32(arguments[1]);
+            int paymentBillId = Convert.ToInt32(argument);
+            string json = JsonConvert.SerializeObject("");
 
-            string json = JsonConvert.SerializeObject(receipt);
-
-            using (HttpClient httpclient = HttpClientFactory.CreateClient())
-            {
-                StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
-                HttpResponseMessage response = await httpclient.PutAsync($"http://localhost:5239/paymentbill/{paymentBillId}", content);
+            StringContent content = new StringContent(json,Encoding.UTF8,"application/json");
+            HttpResponseMessage response = await _httpservice.PayTheBillResponse($"http://localhost:5239/paybill/{paymentBillId}",content);
                 
-                if (response.IsSuccessStatusCode)
-                {
-                    Console.WriteLine("PUT request successful");
-                }
-                else
-                {
-                    Console.WriteLine($"Error: {response.StatusCode}");
-                }
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("PUT request successful");
             }
+            else
+            {
+                Console.WriteLine($"Error: {response.StatusCode}");
+            }
+
+            BindGrid();//!!
         }
     }
 
+    protected void PaymentBill_Sorting(object sender, GridViewSortEventArgs e)
+    {
+        if (ViewState["billtable"] != null)
+        {
+            DataTable dt = (DataTable)ViewState["billtable"];
+            DataView dv = new DataView(dt);
+            dv.Sort = e.SortExpression;
+            PaymentBill.DataSource = dv;
+            PaymentBill.DataBind();
+        }
+    }
 }

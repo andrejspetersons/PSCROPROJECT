@@ -1,33 +1,40 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Server_API.Context;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Server_API.Models.Entity;
-using Server_API.Services;
+using Server_API.Services.UserService;
 
 namespace Server_API.Controllers
 {
     public class UserRegisterController : Controller
     {
 
-        private readonly PSICRODbContext _context;
-        private readonly ValidationService _validationService;
+        private readonly IUserService _userservice;
+        private readonly IValidator<Client> _clientvalidator;
 
-        public UserRegisterController(PSICRODbContext context,ValidationService validationService)
+        public UserRegisterController(IUserService userservice, IValidator<Client> clientvalidator)
         {
-            _context = context;
-            _validationService = validationService;
+            _userservice = userservice;
+            _clientvalidator = clientvalidator;
         }
 
         [HttpPost]
         [Route("register")]
         public IActionResult RegisterUser([FromBody] Client client)
         {
-            if (_validationService.LoginExist(client.Login))
+            var result = _clientvalidator.Validate(client);
+            if (!result.IsValid)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            if (_userservice.isRegistered(client))
             {
                 return Conflict();
             }
-            _context.Clients.Add(client);
-            _context.SaveChanges();
-            return Ok(client);
+            else
+            {
+                return Ok(client);
+            }          
         }
 
 

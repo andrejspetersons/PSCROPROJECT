@@ -11,6 +11,13 @@ using System.ServiceModel.Channels;
 
 public partial class Account_Register : Page
 {
+    private readonly HttpService _httpservice;
+
+    public Account_Register()
+    {
+        _httpservice = new HttpService();
+    }
+
     protected async void CreateUser_Click(object sender, EventArgs e)
     {
         ClientViewModel client = new ClientViewModel();
@@ -21,24 +28,26 @@ public partial class Account_Register : Page
         client.Email = Email.Text;
 
         string jsonData = JsonConvert.SerializeObject(client);
-        using(HttpClient httpClient=new HttpClient())
+        StringContent content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+        try
         {
-            StringContent content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-            try
+            HttpResponseMessage response = await _httpservice.RegistrationResponse("http://localhost:5239/register", content);
+            if (response.IsSuccessStatusCode)
             {
-                HttpResponseMessage response = await httpClient.PostAsync("http://localhost:5239/register", content);
-                if (response.IsSuccessStatusCode)
-                {
-                    Console.WriteLine("Ok");
-                    Response.Redirect("UserPage.aspx");
-                }
+                Console.WriteLine("Ok");
+                Response.Redirect("UserPage.aspx");
             }
-            catch(Exception ex)
+            else
             {
-                Console.WriteLine("HERE IS THE ERROR"+ex.StackTrace);
+                Console.WriteLine("BAD VERY BAD");
             }
         }
-
+        catch (Exception ex)
+        {
+            Console.WriteLine("HERE IS THE ERROR" + ex.StackTrace);
+        }
+    }
+}
 
 
         /*var manager = new UserManager();
@@ -54,10 +63,9 @@ public partial class Account_Register : Page
             ErrorMessage.Text = result.Errors.FirstOrDefault();
         }*/
 
-    }
+ 
 
-    public override void VerifyRenderingInServerForm(Control control)
+   /* public override void VerifyRenderingInServerForm(Control control)
     {
 
-    }
-}
+    }*/

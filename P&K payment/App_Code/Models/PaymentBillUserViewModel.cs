@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -7,21 +8,23 @@ using System.Web;
 /// <summary>
 /// Summary description for PaymentBillViewModel
 /// </summary>
-public class PaymentBillViewModel
+public class PaymentBillUserViewModel
 {
-    [JsonPropertyName("serviceName")]
+    [JsonProperty("paymentBillId")]
+    public int PaymentBillId { get; set; }
+    [JsonProperty("serviceName")]
     public string ServiceName { get; set; }
-    [JsonPropertyName("amount")]
+    [JsonProperty("amount")]
     public decimal Amount { get; set; }
-    [JsonPropertyName("issueDate")]
+    [JsonProperty("issueDate")]
     public DateTime IssueDate { get; set; }
-    [JsonPropertyName("dueToDate")]
+    [JsonProperty("dueToDate")]
     public DateTime DueToDate { get; set; }
-    [JsonPropertyName("paymentDate")]
+    [JsonProperty("paymentDate")]
     public DateTime? PaymentDate { get; set; }
-    [JsonPropertyName("paymentReceipt")]
-    public int? Receipt { get; set; }
-    [JsonPropertyName("paymentStatus")]
+    [JsonProperty("paymentReceipt")]
+    public int? PaymentReceipt { get; set; }
+    [JsonProperty("paymentStatus")]
     public string PaymentStatus { get; set; }
 
 }

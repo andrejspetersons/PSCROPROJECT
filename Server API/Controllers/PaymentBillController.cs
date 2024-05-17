@@ -1,54 +1,117 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Server_API.Context;
-using Server_API.Models.Entity;
-using WebFormsModel = Server_API.Models.WebFormsModels;
-using WinFormsModel = Server_API.Models.WinFormsModels;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
+using Server_API.Models.WinFormsModels;
+using Server_API.Services.AccountantService;
+using Server_API.Services.UserService;
 
 namespace Server_API.Controllers
 {
     public class PaymentBillController : Controller
     {
-        private PSICRODbContext _context;
-        public PaymentBillController(PSICRODbContext context)
+        private readonly IUserService _userservice;
+        private readonly IAccountantService _accountantservice;
+        private readonly IValidator<int>_receiptvalidator;
+        private readonly IValidator<PaymentBillAccountantViewModel> _paymentbillvalidator;
+
+        public PaymentBillController(
+            IUserService userservice,
+            IAccountantService accountantservice,
+            IValidator<int> receiptvalidator,
+            IValidator<PaymentBillAccountantViewModel> paymentbillvalidator)
         {
-            _context = context;    
+            _userservice = userservice;
+            _accountantservice = accountantservice;
+            _receiptvalidator = receiptvalidator;
+            _paymentbillvalidator = paymentbillvalidator;
         }
 
         [HttpPost]
-        [Route("paymentbill")]
-        public IActionResult AddPaymentBill([FromBody]WinFormsModel.PaymentBillViewModel pbv)
+        [Route("paymentbill/{username}")]
+        public IActionResult AddPaymentBill(string username,PaymentBillAccountantViewModel pbv)
         {
-            PaymentBill paymentBill = new PaymentBill()
+            var result = _paymentbillvalidator.Validate(pbv);
+            if (!result.IsValid)
             {
-                Client = _context.Clients.FirstOrDefault(client => client.Login == pbv.Login)!,
-                Service = _context.CompanyServices.FirstOrDefault(service => service.Name == pbv.ServiceName)!,
-                Amount = pbv.Amount,
-                IssueDate = pbv.IssueDate,
-                DueToDate = pbv.DueToDate,             
-            };
+                return BadRequest();
+            }
+            else
+            {
+                _accountantservice.AddPaymentBill(username, pbv);
+                return Ok(); 
+            }
+                        
+        }
 
-            _context.PaymentBills.Add(paymentBill);
-            _context.SaveChanges();
-            return Ok(paymentBill);
+        [HttpGet]
+        [Route("paymentbill/{username}")]
+        public IActionResult GetPaymentBillsByClientLogin(string username)
+        {
+            var clientPaymentBills = _accountantservice.GetPaymentBillsByClientLogin(username);
+
+            if (clientPaymentBills.Count > 0)
+            {
+                return Ok(clientPaymentBills);
+            }
+
+            return NoContent();
 
         }
 
         [HttpPut]
         [Route("paymentbill/{id}")]
-        public async Task<IActionResult> PayTheBill(int id, [FromBody]int receipt)
+        public IActionResult UpdatePaymentBillById(int id, [FromBody] PaymentBillAccountantViewModel pbv)
         {
-            var paymentBill = _context.PaymentBills.FirstOrDefault(bill => bill.Id == id);
-
-            if (paymentBill == null)
+            var result = _paymentbillvalidator.Validate(pbv);
+            if (!result.IsValid)
             {
-                NotFound();
+                return BadRequest();
             }
-                paymentBill.PaymentReceipt = receipt;
-                paymentBill.PaymentStatus = Status.PAID;
-                paymentBill.PaymentDate = DateTime.Now;
-                await _context.SaveChangesAsync();
-                return Ok(paymentBill);
+            else
+            {
+                if (_accountantservice.UpdatePaymentBillById(id, pbv))
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
         }
 
+        [HttpPut]
+        [Route("updatereceipt/{id}")]
+        public IActionResult UpdateReceipt(int id,[FromBody]int receipt)
+        {
+            var result = _receiptvalidator.Validate(receipt);
+            if (!result.IsValid)
+            {
+                return BadRequest(receipt);    
+            }
+
+            if (_userservice.UpdateReceipt(id,receipt))
+            {
+                return Ok();
+            }
+            else
+            {
+                return NotFound();
+            }
+            
+        }
+
+        [HttpDelete]
+        [Route("paymentbill/{id}")]
+        public IActionResult DeletePaymentBillById(int id)
+        {
+            if (_accountantservice.DeletePaymnentBillById(id))
+            {
+                return Ok();
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
     }
 }

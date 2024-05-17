@@ -24,10 +24,10 @@
 
                     <!---UserName-->
                     <div class="form-group">
-                        <asp:Label runat="server" AssociatedControlID="UserName" CssClass="col-md-2 control-label">User name</asp:Label>
+                        <asp:Label runat="server" AssociatedControlID="UserNameTextBox" CssClass="col-md-2 control-label">User name</asp:Label>
                         <div class="col-md-10">
-                            <asp:TextBox runat="server" ID="UserName" CssClass="form-control" />
-                            <asp:RequiredFieldValidator runat="server" ControlToValidate="UserName"
+                            <asp:TextBox runat="server" ID="UserNameTextBox" CssClass="form-control" />
+                            <asp:RequiredFieldValidator runat="server" ControlToValidate="UserNameTextBox"
                                 CssClass="text-danger" ErrorMessage="The user name field is required." />
                         </div>
                     </div>
