@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNet.Identity;
-using Microsoft.Owin.Security;
-using System;
+﻿using System;
 using System.Web;
 using System.Web.UI;
-using P_K_payment;
 using Newtonsoft.Json;
 using System.Net.Http;
 using System.Text;

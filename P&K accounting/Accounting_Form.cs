@@ -167,7 +167,7 @@ namespace P_K_accounting
                 {
                     if (paymentDate > dueToDate)
                     {
-                        paymentDateCell.Style.ForeColor = Color.Red;
+                        row.DefaultCellStyle.BackColor = Color.FromArgb(255, 87, 87);
                     }
                 }
             }

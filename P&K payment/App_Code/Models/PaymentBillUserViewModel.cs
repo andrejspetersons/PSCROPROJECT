@@ -8,6 +8,8 @@ using System.Web;
 /// <summary>
 /// Summary description for PaymentBillViewModel
 /// </summary>
+/// 
+[Serializable]
 public class PaymentBillUserViewModel
 {
     [JsonProperty("paymentBillId")]
