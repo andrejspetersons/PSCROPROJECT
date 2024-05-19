@@ -27,7 +27,7 @@ namespace Server_API.Controllers
 
         [HttpPost]
         [Route("paymentbill/{username}")]
-        public IActionResult AddPaymentBill(string username,PaymentBillAccountantViewModel pbv)
+        public IActionResult AddPaymentBill(string username,[FromBody] PaymentBillAccountantViewModel pbv)
         {
             var result = _paymentbillvalidator.Validate(pbv);
             if (!result.IsValid)

@@ -28,9 +28,14 @@
             return await _httpClient.PutAsync(url, content);
         }
 
-        internal async Task<HttpResponseMessage> DeletePaymentBill(string url)
+        public async Task<HttpResponseMessage> DeletePaymentBill(string url)
         {
             return await _httpClient.DeleteAsync(url);
+        }
+
+        public async Task<HttpResponseMessage> OrderBillsByColumnName(string url,StringContent content)
+        {
+            return await _httpClient.PostAsync(url, content);
         }
     }
 }

@@ -56,8 +56,8 @@
             dueToDateUpdate = new Label();
             Amountupdate = new Label();
             updatingPanel = new Button();
-            button1 = new Button();
             deleteBillBtn = new Button();
+            getClientRecords = new Button();
             ((System.ComponentModel.ISupportInitialize)clientBillsTable).BeginInit();
             AddPanel.SuspendLayout();
             UpdatePanel.SuspendLayout();
@@ -343,16 +343,6 @@
             updatingPanel.UseVisualStyleBackColor = true;
             updatingPanel.Click += updatingPanel_Click;
             // 
-            // button1
-            // 
-            button1.ForeColor = SystemColors.Desktop;
-            button1.Location = new Point(373, 32);
-            button1.Name = "button1";
-            button1.Size = new Size(199, 39);
-            button1.TabIndex = 22;
-            button1.Text = "GetClientRecords";
-            button1.UseVisualStyleBackColor = true;
-            // 
             // deleteBillBtn
             // 
             deleteBillBtn.ForeColor = SystemColors.Desktop;
@@ -364,14 +354,25 @@
             deleteBillBtn.UseVisualStyleBackColor = true;
             deleteBillBtn.Click += deleteBillBtn_Click;
             // 
+            // getClientRecords
+            // 
+            getClientRecords.ForeColor = SystemColors.Desktop;
+            getClientRecords.Location = new Point(391, 32);
+            getClientRecords.Name = "getClientRecords";
+            getClientRecords.Size = new Size(199, 39);
+            getClientRecords.TabIndex = 26;
+            getClientRecords.Text = "GetClientRecords";
+            getClientRecords.UseVisualStyleBackColor = true;
+            getClientRecords.Click += getClientRecords_Click;
+            // 
             // Accounting_Form
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ActiveCaption;
             ClientSize = new Size(1553, 650);
+            Controls.Add(getClientRecords);
             Controls.Add(deleteBillBtn);
-            Controls.Add(button1);
             Controls.Add(UpdatePanel);
             Controls.Add(updatingPanel);
             Controls.Add(addingPanel);
@@ -418,9 +419,9 @@
         private Button updatingPanel;
         private Button addBtn;
         private Button updateBtn;
-        private Button button1;
         private TextBox IdUpdateText;
         private Label IdUpdate;
         private Button deleteBillBtn;
+        private Button getClientRecords;
     }
 }

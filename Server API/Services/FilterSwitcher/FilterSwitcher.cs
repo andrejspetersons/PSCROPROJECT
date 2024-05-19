@@ -15,6 +15,9 @@ namespace Server_API.Services.FilterSwitcher
             var result = new List<PaymentBillAccountantViewModel>();
             switch (columnName.ToLower())
             {
+                case "paymentbillid":
+                    result = _filterService.OrderByPaymentBillId(username);
+                    break;
                 case "servicename":
                     result = _filterService.OrderByServiceName(username);
                     break;

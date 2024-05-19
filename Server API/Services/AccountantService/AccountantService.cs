@@ -13,18 +13,38 @@ namespace Server_API.Services.AccountantService
         }
         public void AddPaymentBill(string username, PaymentBillAccountantViewModel pbv)
         {
-
-            PaymentBill paymentBill = new PaymentBill()
+            var service = _context.CompanyServices.FirstOrDefault(service => service.Name == pbv.ServiceName);
+            if (service == null)
             {
-                Client = _context.Clients.FirstOrDefault(client => client.Login == username)!,
-                Service = _context.CompanyServices.FirstOrDefault(service => service.Name == pbv.ServiceName)!,
-                Amount = pbv.Amount,
-                IssueDate = pbv.IssueDate,
-                DueToDate = pbv.DueToDate,
-            };
+                _context.CompanyServices.Add(new CompanyService { Name = pbv.ServiceName });
+                _context.SaveChanges();
 
-            _context.PaymentBills.Add(paymentBill);
-            _context.SaveChanges();
+                PaymentBill paymentBill = new PaymentBill()
+                {
+                    Client = _context.Clients.FirstOrDefault(client => client.Login == username)!,
+                    Service = _context.CompanyServices.FirstOrDefault(service => service.Name == pbv.ServiceName)!,
+                    Amount = pbv.Amount,
+                    IssueDate = pbv.IssueDate,
+                    DueToDate = pbv.DueToDate,
+                };
+
+                _context.PaymentBills.Add(paymentBill);
+                _context.SaveChanges();
+            }
+            else
+            {
+                PaymentBill paymentBill = new PaymentBill()
+                {
+                    Client = _context.Clients.FirstOrDefault(client => client.Login == username)!,
+                    Service = _context.CompanyServices.FirstOrDefault(service => service.Name == pbv.ServiceName)!,
+                    Amount = pbv.Amount,
+                    IssueDate = pbv.IssueDate,
+                    DueToDate = pbv.DueToDate,
+                };
+
+                _context.PaymentBills.Add(paymentBill);
+                _context.SaveChanges();
+            }
         }
 
         public List<string> GetAllClients()
