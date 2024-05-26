@@ -1,5 +1,4 @@
-﻿
-namespace Server_API.Models.WinFormsModels
+﻿namespace Server_API.Models.WinFormsModels
 {
     public class PaymentBillAccountantViewModel
     {

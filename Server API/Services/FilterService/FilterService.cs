@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Server_API.Context;
+﻿using Server_API.Context;
 using Server_API.Models.WinFormsModels;
 
 namespace Server_API.Services.FilterService

@@ -1,6 +1,5 @@
 ﻿using System.Text.Json.Serialization;
 
-
 namespace P_K_accounting.Models
 {
     public class PaymentBillAccountantViewModel

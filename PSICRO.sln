@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34607.119
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server API", "Server API\Server API.csproj", "{888AF9E5-F71E-4AA3-8C16-51AECFC79A7A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server API", "Server API\Server API.csproj", "{888AF9E5-F71E-4AA3-8C16-51AECFC79A7A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "P&K accounting", "P&K accounting\P&K accounting.csproj", "{CB809961-8C26-403B-BFB0-07F4AC5F24D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "P&K accounting", "P&K accounting\P&K accounting.csproj", "{CB809961-8C26-403B-BFB0-07F4AC5F24D3}"
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "P&K payment", "P&K payment\", "{78CFDA32-D746-4C79-AA75-BD2CAC017182}"
 	ProjectSection(WebsiteProperties) = preProject

@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Server_API.Models.Entity;
 
 namespace Server_API.Services.ValidationServices
 {

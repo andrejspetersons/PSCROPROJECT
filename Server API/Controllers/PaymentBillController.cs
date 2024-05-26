@@ -6,6 +6,7 @@ using Server_API.Services.UserService;
 
 namespace Server_API.Controllers
 {
+    [Route("payment-api")]
     public class PaymentBillController : Controller
     {
         private readonly IUserService _userservice;
@@ -36,8 +37,15 @@ namespace Server_API.Controllers
             }
             else
             {
-                _accountantservice.AddPaymentBill(username, pbv);
-                return Ok(); 
+                if(_accountantservice.AddPaymentBill(username, pbv))
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return NotFound();
+                }
+                 
             }
                         
         }

@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Server_API.Context;
+﻿using Server_API.Context;
 using Server_API.Models.Entity;
 using Server_API.Models.WebFormsModels;
 
@@ -9,12 +7,10 @@ namespace Server_API.Services.UserService
     public class UserService : IUserService
     {
         private readonly PSICRODbContext _context;
-        private readonly ValidationService _validationService;
 
-        public UserService(PSICRODbContext context, ValidationService validationService)
+        public UserService(PSICRODbContext context)
         {
             _context = context;
-            _validationService = validationService;
         }
 
         public List<PaymentBillUserViewModel> GetClientPaymentBills(string username)
@@ -42,18 +38,6 @@ namespace Server_API.Services.UserService
         {
             var result = _context.Clients.FirstOrDefault(client => client.Login == username);
             return result != null;
-        }
-
-        public bool isRegistered(Client client)
-        {
-            if (_validationService.LoginExist(client.Login))
-            {
-                return false;
-            }
-
-            _context.Clients.Add(client);
-            _context.SaveChanges();
-            return true;
         }
 
         public bool PayTheBill(int billId)

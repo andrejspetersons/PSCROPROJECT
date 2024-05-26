@@ -1,5 +1,4 @@
-﻿
-namespace Server_API.Models.Entity
+﻿namespace Server_API.Models.Entity
 {
     public class PaymentBill
     {

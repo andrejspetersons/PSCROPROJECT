@@ -1,5 +1,4 @@
-﻿
-namespace Server_API.Models.WebFormsModels
+﻿namespace Server_API.Models.WebFormsModels
 {
     public class PaymentBillUserViewModel
     {

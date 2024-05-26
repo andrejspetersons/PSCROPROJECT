@@ -11,43 +11,39 @@ namespace Server_API.Services.AccountantService
         {
             _context = context;
         }
-        public void AddPaymentBill(string username, PaymentBillAccountantViewModel pbv)
+        public bool AddPaymentBill(string username, PaymentBillAccountantViewModel pbv)
         {
             var service = _context.CompanyServices.FirstOrDefault(service => service.Name == pbv.ServiceName);
             if (service == null)
             {
-                _context.CompanyServices.Add(new CompanyService { Name = pbv.ServiceName });
-                _context.SaveChanges();
-
-                PaymentBill paymentBill = new PaymentBill()
-                {
-                    Client = _context.Clients.FirstOrDefault(client => client.Login == username)!,
-                    Service = _context.CompanyServices.FirstOrDefault(service => service.Name == pbv.ServiceName)!,
-                    Amount = pbv.Amount,
-                    IssueDate = pbv.IssueDate,
-                    DueToDate = pbv.DueToDate,
-                };
-
-                _context.PaymentBills.Add(paymentBill);
-                _context.SaveChanges();
+                return false;
             }
             else
             {
                 PaymentBill paymentBill = new PaymentBill()
                 {
-                    Client = _context.Clients.FirstOrDefault(client => client.Login == username)!,
-                    Service = _context.CompanyServices.FirstOrDefault(service => service.Name == pbv.ServiceName)!,
+                    Client = _context.Clients.FirstOrDefault(client => client.Login == username),
+                    Service = _context.CompanyServices.FirstOrDefault(service => service.Name == pbv.ServiceName),
                     Amount = pbv.Amount,
                     IssueDate = pbv.IssueDate,
                     DueToDate = pbv.DueToDate,
                 };
 
-                _context.PaymentBills.Add(paymentBill);
-                _context.SaveChanges();
+                if (paymentBill == null)
+                {
+                    return false;
+                }
+                else
+                { 
+                    _context.PaymentBills.Add(paymentBill);
+                    _context.SaveChanges();
+                    return true;
+                }
+ 
             }
         }
 
-        public List<string> GetAllClients()
+        public List<string> GetAllClientsUserNames()
         {
            return _context.Clients.Select(client => client.Login).ToList();
         }

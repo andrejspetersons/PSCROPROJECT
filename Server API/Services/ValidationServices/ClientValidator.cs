@@ -24,19 +24,17 @@ namespace Server_API.Services.ValidationServices
         }
         private bool isValidName(string name)
         {
-            //return Regex.IsMatch(name, @"^[^\\d\\W]+$");
             return Regex.IsMatch(name, @"^[a-zA-Z]+$");
         }
 
         private bool isValidSurname(string name)
         {
-            //return Regex.IsMatch(name, @"^[^\\d\\W]+$");
             return Regex.IsMatch(name, @"^[a-zA-Z]+$");
         }
 
         private bool isValidPhone(string phone)
         {
-            return Regex.IsMatch(phone, @"^\+?\d +$");
+            return Regex.IsMatch(phone, @"^\+?\d+$");
         }
 
         private bool isValidEmail(string email)

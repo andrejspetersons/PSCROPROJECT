@@ -1,5 +1,4 @@
-﻿
-namespace P_K_payment
+﻿namespace P_K_payment
 {
     public partial class Startup {
        

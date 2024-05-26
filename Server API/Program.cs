@@ -7,6 +7,8 @@ using System.Reflection;
 using FluentValidation;
 using Server_API.Services.FilterSwitcher;
 using Server_API.Services.FilterService;
+using Server_API.Services.ClientService;
+using Server_API.Services.CompanyServices;
 
 namespace Server_API
 {
@@ -31,10 +33,13 @@ namespace Server_API
             builder.Services.AddScoped<IAccountantService, AccountantService>();
             builder.Services.AddScoped<IFilterSwitcher, FilterSwitcher>();
             builder.Services.AddScoped<IFilterService, FilterService>();
+            builder.Services.AddScoped<IClientService, ClientService>();
+            builder.Services.AddScoped<ICompanyServices, CompanyServices>();
 
             var assembly = Assembly.GetExecutingAssembly();
             builder.Services.AddAutoMapper(assembly);
             builder.Services.AddValidatorsFromAssembly(assembly);
+            
             
             
 
@@ -46,8 +51,9 @@ namespace Server_API
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+            
             app.UseAuthorization();
+            app.Urls.Add("http://localhost:5239");
 
 
             app.MapControllers();

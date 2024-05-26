@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using Server_API.Models.Entity;
 using Server_API.Models.WinFormsModels;
 
 namespace Server_API.Services.ValidationServices

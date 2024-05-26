@@ -1,14 +1,11 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
-using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -52,7 +49,7 @@ public partial class Account_UserPage : Page
     {
         using (HttpClient httpClient = HttpClientFactory.CreateClient())
         {
-            HttpResponseMessage response = await _httpservice.GetPaymentBills($"http://localhost:5239/paymentbills/{Session["UserName"]}");
+            HttpResponseMessage response = await _httpservice.GetPaymentBills($"http://localhost:5239/client-api/paymentbills/{Session["UserName"]}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -107,7 +104,7 @@ public partial class Account_UserPage : Page
         StringContent content = new StringContent(jsonData, Encoding.UTF8, "application/json");
         try
         {
-            HttpResponseMessage response = await _httpservice.UpdateReceipt($"http://localhost:5239/updatereceipt/{id}", content);
+            HttpResponseMessage response = await _httpservice.UpdateReceipt($"http://localhost:5239/payment-api/updatereceipt/{id}", content);
             if (response.IsSuccessStatusCode)
             {
                 Console.WriteLine("Good");
@@ -143,7 +140,7 @@ public partial class Account_UserPage : Page
             string json = JsonConvert.SerializeObject("");
 
             StringContent content = new StringContent(json,Encoding.UTF8,"application/json");
-            HttpResponseMessage response = await _httpservice.PayTheBillResponse($"http://localhost:5239/paybill/{paymentBillId}",content);
+            HttpResponseMessage response = await _httpservice.PayTheBillResponse($"http://localhost:5239/client-api/paybill/{paymentBillId}",content);
                 
             if (response.IsSuccessStatusCode)
             {
@@ -154,7 +151,7 @@ public partial class Account_UserPage : Page
                 Console.WriteLine($"Error: {response.StatusCode}");
             }
 
-            BindGrid();//!!
+            BindGrid();
         }
     }
 
