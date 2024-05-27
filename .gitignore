@@ -8,6 +8,9 @@
 #Custom ignore
 
 
+#Custom exclusion
+!/P&K payment/Bin/
+
 
 # User-specific files
 *.suo
@@ -26,7 +29,7 @@
 x64/
 x86/
 bld/
-[Bb]in/
+
 [Oo]bj/
 [Ll]og/
 
