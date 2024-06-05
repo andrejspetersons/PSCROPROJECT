@@ -10,19 +10,13 @@ namespace Server_API.Services.CompanyServices
         {
             _context = context;
         }
-        public bool AddService(string serviceName)
+        public CompanyService AddService(string serviceName)
         {
             var service = _context.CompanyServices.FirstOrDefault(service => service.Name == serviceName);
-            if (service == null)
-            {
-                _context.CompanyServices.Add(new CompanyService { Name = serviceName });
-                _context.SaveChanges();
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            service=new CompanyService { Name = serviceName };
+            _context.CompanyServices.Add(service);
+            _context.SaveChanges();
+            return service;
         }
 
         public bool DeleteServiceById(int id)
@@ -50,18 +44,18 @@ namespace Server_API.Services.CompanyServices
             return _context.CompanyServices.Select(service => service.Name).ToList();
         }
 
-        public bool UpdateServiceById(int id,string serviceName)
+        public CompanyService UpdateServiceById(int id,string serviceName)
         {
             var service = _context.CompanyServices.FirstOrDefault(service => service.Id == id);
             if (service == null)
             {
-                return false;
+                return null;
             }
             else
             {
                 service.Name = serviceName;
                 _context.SaveChanges();
-                return true;
+                return service;
             }
         }
     }

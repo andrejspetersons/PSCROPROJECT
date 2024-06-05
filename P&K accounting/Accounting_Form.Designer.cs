@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             clientDropDown = new ComboBox();
             client = new Label();
             serviceNameAdd = new Label();
@@ -57,7 +57,6 @@
             Amountupdate = new Label();
             updatingPanelBtn = new Button();
             deleteBtn = new Button();
-            getClientRecords = new Button();
             btnToClientsForm = new Button();
             btnToServiceForm = new Button();
             getServiceDropDownBtn = new Button();
@@ -122,10 +121,10 @@
             clientBillsTable.Location = new Point(286, 95);
             clientBillsTable.Name = "clientBillsTable";
             clientBillsTable.ReadOnly = true;
-            dataGridViewCellStyle2.BackColor = SystemColors.Control;
-            dataGridViewCellStyle2.Font = new Font("Times New Roman", 9.75F, FontStyle.Regular, GraphicsUnit.Point);
-            dataGridViewCellStyle2.ForeColor = SystemColors.WindowText;
-            clientBillsTable.RowsDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle1.BackColor = SystemColors.Control;
+            dataGridViewCellStyle1.Font = new Font("Times New Roman", 9.75F, FontStyle.Regular, GraphicsUnit.Point);
+            dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
+            clientBillsTable.RowsDefaultCellStyle = dataGridViewCellStyle1;
             clientBillsTable.RowTemplate.Height = 25;
             clientBillsTable.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             clientBillsTable.Size = new Size(700, 250);
@@ -240,6 +239,7 @@
             // 
             idUpdateText.Location = new Point(19, 47);
             idUpdateText.Name = "idUpdateText";
+            idUpdateText.ReadOnly = true;
             idUpdateText.Size = new Size(199, 23);
             idUpdateText.TabIndex = 25;
             idUpdateText.Text = "0";
@@ -360,21 +360,10 @@
             deleteBtn.UseVisualStyleBackColor = true;
             deleteBtn.Click += deleteBillBtn_Click;
             // 
-            // getClientRecords
-            // 
-            getClientRecords.ForeColor = SystemColors.Desktop;
-            getClientRecords.Location = new Point(827, 30);
-            getClientRecords.Name = "getClientRecords";
-            getClientRecords.Size = new Size(199, 39);
-            getClientRecords.TabIndex = 26;
-            getClientRecords.Text = "GetClientRecords";
-            getClientRecords.UseVisualStyleBackColor = true;
-            getClientRecords.Click += getClientRecords_Click;
-            // 
             // btnToClientsForm
             // 
             btnToClientsForm.ForeColor = SystemColors.Desktop;
-            btnToClientsForm.Location = new Point(1059, 30);
+            btnToClientsForm.Location = new Point(824, 30);
             btnToClientsForm.Name = "btnToClientsForm";
             btnToClientsForm.Size = new Size(199, 39);
             btnToClientsForm.TabIndex = 27;
@@ -385,7 +374,7 @@
             // btnToServiceForm
             // 
             btnToServiceForm.ForeColor = SystemColors.Desktop;
-            btnToServiceForm.Location = new Point(1291, 30);
+            btnToServiceForm.Location = new Point(1054, 30);
             btnToServiceForm.Name = "btnToServiceForm";
             btnToServiceForm.Size = new Size(199, 39);
             btnToServiceForm.TabIndex = 28;
@@ -425,7 +414,6 @@
             Controls.Add(getServiceDropDownBtn);
             Controls.Add(btnToServiceForm);
             Controls.Add(btnToClientsForm);
-            Controls.Add(getClientRecords);
             Controls.Add(deleteBtn);
             Controls.Add(UpdatePanel);
             Controls.Add(updatingPanelBtn);
@@ -436,7 +424,7 @@
             Controls.Add(AddPanel);
             ForeColor = SystemColors.HighlightText;
             Name = "Accounting_Form";
-            Text = "Form1";
+            Text = "Accounting_Form";
             Load += Accounting_Form_Load;
             ((System.ComponentModel.ISupportInitialize)clientBillsTable).EndInit();
             AddPanel.ResumeLayout(false);
@@ -475,7 +463,6 @@
         private TextBox idUpdateText;
         private Label IdUpdate;
         private Button deleteBtn;
-        private Button getClientRecords;
         private Button btnToClientsForm;
         private Button btnToServiceForm;
         private ComboBox serviceDropDown;

@@ -1,0 +1,17 @@
+2024-06-05 12:05:40.122 +03:00 [INF] Method GetServiceNames was called with Result:200
+2024-06-05 12:05:41.266 +03:00 [INF] Method GetAllClientsUsernames was called with Result:200
+2024-06-05 12:05:42.521 +03:00 [INF] Method GetPaymentBillsByClientLogin was called with Result:200
+2024-06-05 12:06:26.085 +03:00 [INF] Method GetServiceNames was called with Result:200
+2024-06-05 12:06:26.854 +03:00 [INF] Method GetAllClientsUsernames was called with Result:200
+2024-06-05 12:06:27.807 +03:00 [INF] Method GetPaymentBillsByClientLogin was called with Result:200
+2024-06-05 12:06:30.232 +03:00 [INF] Method GetAllClients was called with Result:200
+2024-06-05 12:07:43.400 +03:00 [INF] Method AddClient was called with Result:200
+2024-06-05 12:07:54.331 +03:00 [INF] Method DeleteClientById was called with Result:200
+2024-06-05 12:08:29.637 +03:00 [INF] Method GetServiceNames was called with Result:200
+2024-06-05 12:08:30.438 +03:00 [INF] Method GetAllClientsUsernames was called with Result:200
+2024-06-05 12:08:31.465 +03:00 [INF] Method GetPaymentBillsByClientLogin was called with Result:200
+2024-06-05 12:08:59.505 +03:00 [INF] Method AddPaymentBill was called with Result:200
+2024-06-05 12:09:04.031 +03:00 [INF] Method DeletePaymentBillById was called with Result:200
+2024-06-05 12:09:08.313 +03:00 [INF] Method AddPaymentBill was called with Result:200
+2024-06-05 12:09:21.913 +03:00 [INF] Method UpdatePaymentBillById was called with Result:200
+2024-06-05 12:09:28.904 +03:00 [INF] Method DeletePaymentBillById was called with Result:200

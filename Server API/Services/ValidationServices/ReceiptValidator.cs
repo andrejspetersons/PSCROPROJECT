@@ -1,20 +1,27 @@
 ﻿using FluentValidation;
+using System.Text.RegularExpressions;
 
 namespace Server_API.Services.ValidationServices
 {
-    public class ReceiptValidator:AbstractValidator<int>
+    public class ReceiptValidator:AbstractValidator<string>
     {
         public ReceiptValidator()
         {
-            RuleFor(x => x)
-                .Must(isValidReceiptNumber)
-                .GreaterThan(0)
-                .LessThan(99999);             
+            RuleFor(receipt => receipt)
+                .Cascade(CascadeMode.Stop)
+                .Must(isValidReceiptFormat).WithMessage("Receipt is invalid")
+                .Must(isValidReceiptNumber).WithMessage("Receipt should be in range of 0 to 99999");
+            
         }
 
-        private bool isValidReceiptNumber(int receiptNumber)
+        private bool isValidReceiptNumber(string receiptNumber)
         {
-            return receiptNumber > 0 && receiptNumber < 99999;
+            return Convert.ToInt32(receiptNumber) > 0 && Convert.ToInt32(receiptNumber) < 99999;
+        }
+
+        private bool isValidReceiptFormat(string receipt)
+        {
+            return Regex.IsMatch(receipt, "^[0-9]+$");
         }
     }
 }

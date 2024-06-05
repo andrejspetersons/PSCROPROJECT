@@ -11,12 +11,12 @@ namespace Server_API.Services.AccountantService
         {
             _context = context;
         }
-        public bool AddPaymentBill(string username, PaymentBillAccountantViewModel pbv)
+        public PaymentBill AddPaymentBill(string username, PaymentBillAccountantViewModel pbv)
         {
             var service = _context.CompanyServices.FirstOrDefault(service => service.Name == pbv.ServiceName);
             if (service == null)
             {
-                return false;
+                return null;
             }
             else
             {
@@ -31,13 +31,13 @@ namespace Server_API.Services.AccountantService
 
                 if (paymentBill == null)
                 {
-                    return false;
+                    return null;
                 }
                 else
                 { 
                     _context.PaymentBills.Add(paymentBill);
                     _context.SaveChanges();
-                    return true;
+                    return paymentBill;
                 }
  
             }
@@ -68,13 +68,13 @@ namespace Server_API.Services.AccountantService
             return query;
         }
 
-        public bool UpdatePaymentBillById(int id, PaymentBillAccountantViewModel pbv)
+        public PaymentBill UpdatePaymentBillById(int id, PaymentBillAccountantViewModel pbv)
         {
             var bill = _context.PaymentBills.FirstOrDefault(bill => bill.Id==id);
             var serviceName = _context.CompanyServices.FirstOrDefault(service => service.Name == pbv.ServiceName);
             if (bill == null || serviceName == null)
             {
-                return false;
+                return null;
             }
             else
             {
@@ -83,7 +83,7 @@ namespace Server_API.Services.AccountantService
                 bill.IssueDate = pbv.IssueDate;
                 bill.DueToDate = pbv.DueToDate;
                 _context.SaveChanges();
-                return true;
+                return bill;
             }
         }
 

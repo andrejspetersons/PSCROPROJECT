@@ -42,7 +42,6 @@
             ServiceNameUpdate = new Label();
             ServiceIdUpdate = new TextBox();
             serviceId = new Label();
-            getServicesBtn = new Button();
             ((System.ComponentModel.ISupportInitialize)companyserviceTable).BeginInit();
             addingPanel.SuspendLayout();
             updatingPanel.SuspendLayout();
@@ -53,6 +52,7 @@
             companyserviceTable.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             companyserviceTable.Location = new Point(354, 75);
             companyserviceTable.Name = "companyserviceTable";
+            companyserviceTable.ReadOnly = true;
             companyserviceTable.RowTemplate.Height = 25;
             companyserviceTable.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             companyserviceTable.Size = new Size(700, 250);
@@ -172,6 +172,7 @@
             // 
             ServiceIdUpdate.Location = new Point(17, 59);
             ServiceIdUpdate.Name = "ServiceIdUpdate";
+            ServiceIdUpdate.ReadOnly = true;
             ServiceIdUpdate.Size = new Size(199, 23);
             ServiceIdUpdate.TabIndex = 30;
             ServiceIdUpdate.Text = "0";
@@ -187,23 +188,12 @@
             serviceId.TabIndex = 29;
             serviceId.Text = "ServiceId";
             // 
-            // getServicesBtn
-            // 
-            getServicesBtn.Location = new Point(354, 12);
-            getServicesBtn.Name = "getServicesBtn";
-            getServicesBtn.Size = new Size(199, 39);
-            getServicesBtn.TabIndex = 32;
-            getServicesBtn.Text = "GetServices";
-            getServicesBtn.UseVisualStyleBackColor = true;
-            getServicesBtn.Click += getServicesBtn_Click;
-            // 
             // CompanyService_Form
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ActiveCaption;
             ClientSize = new Size(1441, 571);
-            Controls.Add(getServicesBtn);
             Controls.Add(updatingPanel);
             Controls.Add(addPanelBtn);
             Controls.Add(updatePanelBtn);
@@ -237,6 +227,5 @@
         private Label serviceId;
         private Button addBtn;
         private Button updateBtn;
-        private Button getServicesBtn;
     }
 }

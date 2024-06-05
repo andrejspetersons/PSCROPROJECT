@@ -1,43 +1,50 @@
-using P_K_accounting.Models; 
-using P_K_accounting.Service;
+using P_K_accounting.Models;
+using P_K_accounting.Service.EntityService;
+using P_K_accounting.Service.FormService;
+using P_K_accounting.Service.GridViewServices;
+using P_K_accounting.Service.HttpServices;
+using P_K_accounting.Service.UIServices;
+using System.Net;
 
 namespace P_K_accounting
 {
     public partial class Accounting_Form : Form
     {
+        #region Services
         private readonly ClientPaymentBillService _clientService;
         private readonly CompanyFacilityService _companyService;
+        private readonly UIHelper _helper;
+        private readonly GridViewBillService _gridService;
+        private readonly FormSwitcher _formSwitcher;
+        #endregion
+        #region FormDeclaration
         private Clients_Form _clientsForm;
         private CompanyService_Form _companyServiceForm;
-
-
+        #endregion
+        
         public Accounting_Form()
+        #region Constructor
         {
+
             InitializeComponent();
             _clientService = new ClientPaymentBillService(new HttpService_PaymentBills());
             _companyService = new CompanyFacilityService(new HttpService_CompanyService());
+            _helper = new UIHelper();
+            _gridService = new GridViewBillService();
+            _formSwitcher = new FormSwitcher();
         }
+        #endregion
 
+        #region OnFormLoadEvent
         private async void Accounting_Form_Load(object sender, EventArgs e)
         {
-            DropDownLoadingMode(clientDropDown);
-            DropDownLoadingMode(serviceDropDown);
+            _helper.DropDownLoadingMode(clientDropDown);
+            _helper.DropDownLoadingMode(serviceDropDown);
             await LoadServicesAsync();
             await LoadClientsAsync();
         }
-
-        private void DropDownLoadingMode(ComboBox dropDownOnLoad)
-        {
-            dropDownOnLoad.Text = "Loading...";
-            dropDownOnLoad.Enabled = false;
-        }
-
-        private void DropDownLoaded(ComboBox dropDownLoaded)
-        {
-            dropDownLoaded.Text = "";
-            dropDownLoaded.Enabled = true;
-        }
-
+        #endregion
+        #region EventHandlers
         private async void clientDropDown_SelectedIndexChanged(object sender, EventArgs e)
         {
             await LoadClientBillsAsync();
@@ -58,19 +65,14 @@ namespace P_K_accounting
             await DeletePaymentAsync();
         }
 
-        private async void getClientRecords_Click(object sender, EventArgs e)
-        {
-            await LoadClientBillsAsync();
-        }
-
         private void addingPanelBtn_Click(object sender, EventArgs e)
         {
-            TogglePanels(AddPanel, UpdatePanel);
+            _helper.TogglePanels(AddPanel, UpdatePanel);
         }
 
         private void updatingPanelBtn_Click(object sender, EventArgs e)
         {
-            TogglePanels(UpdatePanel, AddPanel);
+            _helper.TogglePanels(UpdatePanel, AddPanel);
         }
 
         private void clientBillsTable_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -79,7 +81,7 @@ namespace P_K_accounting
         }
         private void clientBillsTable_RowPrePaint(object sender, DataGridViewRowPrePaintEventArgs e)
         {
-            HighlightLatePayments(e.RowIndex);
+            _helper.HighlightLatePayments(clientBillsTable.Rows[e.RowIndex]);
         }
 
         private async void clientBillsTable_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -89,14 +91,7 @@ namespace P_K_accounting
                 await FilterData(clientBillsTable.Columns[e.ColumnIndex].DataPropertyName);
             }
         }
-
-        private void TogglePanels(Panel visiblePanel, Panel hidePanel)
-        {
-            Point location = new Point(12, 75);
-            visiblePanel.Visible = true;
-            hidePanel.Visible = false;
-            visiblePanel.Location = location;
-        }
+        #endregion
 
         private void PopulateUpdateFields(int rowIndex)
         {
@@ -109,57 +104,34 @@ namespace P_K_accounting
             updateDueToDateTimePicker.Value = DateTime.Parse(row.Cells[4].Value.ToString());
         }
 
-        private void HighlightLatePayments(int rowIndex)
-        {
-            var row = clientBillsTable.Rows[rowIndex];
-            if (row.Cells[5].Value == null) return;
-            if (DateTime.TryParse(row.Cells[4].Value.ToString(), out var dueToDate) &&
-                DateTime.TryParse(row.Cells[5].Value.ToString(), out var paymentDate) &&
-                paymentDate > dueToDate)
-            {
-                row.DefaultCellStyle.BackColor = Color.FromArgb(255, 87, 87);
-            }
-        }
-
         private async Task LoadClientsAsync()
         {
-            clientDropDown.Items.Clear();
             var clients = await _clientService.GetClientListAsync();
             if (clients.Any())
             {
-                foreach (var client in clients)
-                {
-                    clientDropDown.Items.Add(client);
-                }
-
-                DropDownLoaded(clientDropDown);
+                clientDropDown.DataSource = clients;
+                _helper.DropDownLoaded(clientDropDown);
             }
             else
             {
-                clientDropDown.Text = "No clients available";
-                clientDropDown.Enabled = false;
-            }
-
+                _helper.DropDownFailToLoad(clientDropDown);
+            }          
         }
 
         private async Task LoadServicesAsync()
         {
-            serviceDropDown.Items.Clear();
+            
             var services = await _companyService.GetServiceNames();
             if (services.Any())
             {
-                foreach (var service in services)
-                {
-                    serviceDropDown.Items.Add(service);
-                }
-
-                DropDownLoaded(serviceDropDown);
+                serviceDropDown.DataSource = services;
+                _helper.DropDownLoaded(serviceDropDown);
             }
             else
             {
-                serviceDropDown.Text = "No service available";
-                serviceDropDown.Enabled = false;
+                _helper.DropDownFailToLoad(serviceDropDown);
             }
+             
         }
 
         private async Task LoadClientBillsAsync()
@@ -169,12 +141,9 @@ namespace P_K_accounting
                 MessageBox.Show("Choose client from dropdown list first", "Info", MessageBoxButtons.OK);
                 return;
             }
-            else
-            {
-                var selectedClientName = clientDropDown.SelectedItem.ToString();
-                var clientBills = await _clientService.GetClientPaymentBillsAsync(selectedClientName);
-                clientBillsTable.DataSource = clientBills;
-            }
+            var selectedClientName = clientDropDown.SelectedItem.ToString();
+            var clientBills = await _clientService.GetClientPaymentBillsAsync(selectedClientName);
+            clientBillsTable.DataSource = clientBills;
         }
 
         private async Task AddPaymentAsync()
@@ -194,7 +163,12 @@ namespace P_K_accounting
             };
 
             var response = await _clientService.AddPaymentAsync(clientDropDown.SelectedItem.ToString(), pbvm);
-            MessageBox.Show(response.IsSuccessStatusCode ? "Payment Bill successfully added" : "Entered data is incorrect", "Info", MessageBoxButtons.OK);
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                clientBillsTable.DataSource = await _gridService.AddRecordToGrid(response, clientBillsTable);
+                clientBillsTable.Refresh();
+            }
+            await _helper.GetDialogByResponse(response);
         }
 
         private async Task UpdatePaymentAsync()
@@ -208,9 +182,14 @@ namespace P_K_accounting
             };
 
             var response = await _clientService.UpdateClientBillByIdAsync(Convert.ToInt32(idUpdateText.Text), pbvm);
-            MessageBox.Show(response.IsSuccessStatusCode ? "Payment info was updated successfully" : "Entered data is incorrect", "Info", MessageBoxButtons.OK);
-
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                clientBillsTable.DataSource=await _gridService.UpdateRecordInGrid(response, clientBillsTable);
+                clientBillsTable.Refresh();
+            }
+            await _helper.GetDialogByResponse(response);
         }
+
         private async Task DeletePaymentAsync()
         {
             if (clientBillsTable.SelectedRows.Count == 0)
@@ -219,8 +198,14 @@ namespace P_K_accounting
                 return;
             }
 
-            var response = await _clientService.DeletePaymentBillAsync(Convert.ToInt32(clientBillsTable.SelectedRows[0].Cells[0].Value));
-            MessageBox.Show(response.IsSuccessStatusCode ? "Payment Bill was successfully deleted" : "Payment Bill doesn't exist", "Info", MessageBoxButtons.OK);
+            int idToDelete = Convert.ToInt32(clientBillsTable.SelectedRows[0].Cells[0].Value);
+            var response = await _clientService.DeletePaymentBillAsync(idToDelete);
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                clientBillsTable.DataSource = await _gridService.DeleteRecordFromGrid(idToDelete, clientBillsTable);
+                clientBillsTable.Refresh();
+            }
+            await _helper.GetDialogByResponse(response);
         }
 
         private async Task FilterData(string columnName)
@@ -232,43 +217,29 @@ namespace P_K_accounting
 
         private void btnToClientsForm_Click(object sender, EventArgs e)
         {
-            if (_clientsForm == null || _clientsForm.IsDisposed)
-            {
-                _clientsForm = new Clients_Form();
-                _clientsForm.FormClosed += (s, args) => _clientsForm = null;
-                _clientsForm.Show();
-            }
-            else
-            {
-                _clientsForm.BringToFront();
-            }
-
+            _formSwitcher.ShowClientsForm();
         }
-
+        
         private void btnToServiceForm_Click(object sender, EventArgs e)
         {
-            if (_companyServiceForm == null || _companyServiceForm.IsDisposed)
-            {
-                _companyServiceForm = new CompanyService_Form();
-                _companyServiceForm.FormClosed += (s, args) => _companyServiceForm = null;
-                _companyServiceForm.Show();
-            }
-
+            _formSwitcher.ShowCompanyServiceForm();
         }
 
+        #region LoadDataForComboBoxes
         private async void getServiceDropDownBtn_Click(object sender, EventArgs e)
         {
-            DropDownLoadingMode(serviceDropDown);
+            _helper.DropDownLoadingMode(serviceDropDown);
             await LoadServicesAsync();
-            DropDownLoaded(serviceDropDown);
+            _helper.DropDownLoaded(serviceDropDown);
         }
 
         private async void getClientDropDownBtn_Click(object sender, EventArgs e)
         {
-            DropDownLoadingMode(clientDropDown);
+            _helper.DropDownLoadingMode(clientDropDown);
             await LoadClientsAsync();
-            DropDownLoaded(clientDropDown);
+            _helper.DropDownLoaded(clientDropDown);
         }
+        #endregion
     }
 }
 

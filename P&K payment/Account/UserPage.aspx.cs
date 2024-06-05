@@ -1,22 +1,21 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 
 public partial class Account_UserPage : Page
 {
-    private readonly HttpService _httpservice;
+    private readonly ClientService _clientservice;
+    private readonly UIHelper _helper;
 
     public Account_UserPage()
     {
-        _httpservice = new HttpService();
+        _clientservice = new ClientService(new HttpService());
+        _helper = new UIHelper();
     }
 
     protected async void Page_Load(object sender, EventArgs e)
@@ -30,7 +29,6 @@ public partial class Account_UserPage : Page
                 BindGrid();
 
             }
-
         }
         else
         {
@@ -47,19 +45,15 @@ public partial class Account_UserPage : Page
 
     private async void BindGrid()
     {
-        using (HttpClient httpClient = HttpClientFactory.CreateClient())
+        var paymentBillList = await _clientservice.GetPaymentBillsAsync(Session["UserName"] as string);
+        PaymentBill.DataSource = paymentBillList;
+        ViewState["billtable"] = paymentBillList;
+        if (ViewState["sortDirection"] == null)
         {
-            HttpResponseMessage response = await _httpservice.GetPaymentBills($"http://localhost:5239/client-api/paymentbills/{Session["UserName"]}");
-
-            if (response.IsSuccessStatusCode)
-            {
-                string content = await response.Content.ReadAsStringAsync();
-                var paymentBillList = JsonConvert.DeserializeObject<IEnumerable<PaymentBillUserViewModel>>(content);
-                PaymentBill.DataSource = paymentBillList;
-                ViewState["billtable"] = paymentBillList;
-                PaymentBill.DataBind();
-            }
+            ViewState["sortDirection"] = "ASC";
         }
+
+        PaymentBill.DataBind();
     }
 
     protected void OnRowDataBound(object sender, GridViewRowEventArgs e)
@@ -98,32 +92,22 @@ public partial class Account_UserPage : Page
     {
         GridViewRow row = PaymentBill.Rows[e.RowIndex];
         int id = Convert.ToInt32(PaymentBill.DataKeys[e.RowIndex].Values[0]);
-        int receipt = Convert.ToInt32((row.Cells[7].Controls[0] as TextBox).Text);
+        string receipt = (row.Cells[7].Controls[0] as TextBox).Text;
+        HttpResponseMessage response = await _clientservice.UpdateReceiptAsync(id, receipt);
 
-        string jsonData = JsonConvert.SerializeObject(receipt);
-        StringContent content = new StringContent(jsonData, Encoding.UTF8, "application/json");
-        try
+        if (response.IsSuccessStatusCode)
         {
-            HttpResponseMessage response = await _httpservice.UpdateReceipt($"http://localhost:5239/payment-api/updatereceipt/{id}", content);
-            if (response.IsSuccessStatusCode)
-            {
-                Console.WriteLine("Good");
-            }
-            else
-            {
-                Console.WriteLine("Not Good");
-            }
-
+            Response.Write("<script>alert('Receipt was updated successfully')</script");
         }
-        catch (Exception ex)
+        else
         {
-            Console.WriteLine("HERE IS THE ERROR" + ex.StackTrace);
+            string errorMessage = await response.Content.ReadAsStringAsync();
+            var errors = JsonConvert.DeserializeObject<List<string>>(errorMessage);
+            Response.Write("<script>alert('" + string.Join("\n", errors) + "')</script");
         }
-
+        PaymentBill.EditIndex = -1;
         BindGrid();
-
     }
-
 
     protected void OnRowCancelEdit(object sender, GridViewCancelEditEventArgs e)
     {
@@ -137,20 +121,18 @@ public partial class Account_UserPage : Page
         {
             string argument = e.CommandArgument.ToString();
             int paymentBillId = Convert.ToInt32(argument);
-            string json = JsonConvert.SerializeObject("");
-
-            StringContent content = new StringContent(json,Encoding.UTF8,"application/json");
-            HttpResponseMessage response = await _httpservice.PayTheBillResponse($"http://localhost:5239/client-api/paybill/{paymentBillId}",content);
+            HttpResponseMessage response = await _clientservice.PayBillAsync(paymentBillId);
                 
             if (response.IsSuccessStatusCode)
             {
-                Console.WriteLine("PUT request successful");
+                Response.Write("<script>alert('Bill was payed successfully')</script");
             }
             else
             {
-                Console.WriteLine($"Error: {response.StatusCode}");
+                string errorMessage = await response.Content.ReadAsStringAsync();
+                var errors = JsonConvert.DeserializeObject<List<string>>(errorMessage);
+                Response.Write("<script>alert('" + string.Join("\n", errors) + "')</script");
             }
-
             BindGrid();
         }
     }
@@ -159,31 +141,9 @@ public partial class Account_UserPage : Page
     {
         var paymentBillList = (IEnumerable<PaymentBillUserViewModel>)ViewState["billtable"];
         string sortExpression = e.SortExpression;
-        switch (sortExpression.ToLower())
-        {
-            case "servicename":
-                paymentBillList = paymentBillList.OrderBy(item => item.ServiceName);
-                    break;
-            case "amount":
-                paymentBillList = paymentBillList.OrderBy(item => item.Amount);
-                break;
-            case "issuedate":
-                paymentBillList = paymentBillList.OrderBy(item => item.IssueDate);
-                break;
-            case "duetodate":
-                paymentBillList = paymentBillList.OrderBy(item => item.DueToDate);
-                break;
-            case "paymentdate":
-                paymentBillList = paymentBillList.OrderBy(item => item.PaymentDate);
-                break;
-            case "paymentstatus":
-                paymentBillList = paymentBillList.OrderBy(item => item.PaymentStatus);
-                break;
-            default:
-                break;
-        }
-
-        PaymentBill.DataSource = paymentBillList;
+        string sortDirection = ViewState["sortDirection"].ToString();
+        PaymentBill.DataSource = _helper.SortData(paymentBillList, sortExpression, sortDirection);
         PaymentBill.DataBind();
+        ViewState["sortDirection"] = sortDirection == "ASC" ? "DESC" : "ASC";
     }
 }

@@ -57,7 +57,7 @@ namespace Server_API.Services.UserService
             }
         }
 
-        public bool UpdateReceipt(int billId, int receipt)
+        public bool UpdateReceipt(int billId, string receipt)
         {
             var paymentBill = _context.PaymentBills.FirstOrDefault(bill => bill.Id == billId);
             if (paymentBill == null)
@@ -66,7 +66,7 @@ namespace Server_API.Services.UserService
             }
             else
             {
-                paymentBill.PaymentReceipt = receipt;
+                paymentBill.PaymentReceipt = Convert.ToInt32(receipt);
                 _context.SaveChanges();
                 return true;
             }

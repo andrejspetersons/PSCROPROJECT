@@ -5,6 +5,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <h1>Your Bills</h1>
+    <asp:HyperLink ID="HyperLink1" runat="server" NavigateUrl="~/Account/Login.aspx">Log out</asp:HyperLink>
     <link href="~/Content/bootstrap.css" rel="stylesheet" />
 </head>
 <body>
