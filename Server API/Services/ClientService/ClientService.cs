@@ -12,18 +12,19 @@ namespace Server_API.Services.ClientService
             _context = context;
         }
 
-        public void AddClient(Client client)
+        public Client AddClient(Client client)
         {
             _context.Add(client);
             _context.SaveChanges();
+            return client;
         }
 
-        public bool UpdateClientById(int id,Client updatedClient)
+        public Client UpdateClientById(int id,Client updatedClient)
         {
             var client = _context.Clients.FirstOrDefault(client => client.Id == id);
             if (client == null)
             {
-                return false;
+                return null;
             }
             else
             {
@@ -32,7 +33,7 @@ namespace Server_API.Services.ClientService
                 client.Phone = updatedClient.Phone;
                 client.Email = updatedClient.Email;
                 _context.SaveChanges();
-                return true;
+                return client;
             }
         }
 

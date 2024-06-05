@@ -1,4 +1,7 @@
-﻿using P_K_accounting.Service;
+﻿using P_K_accounting.Service.EntityService;
+using P_K_accounting.Service.GridViewServices;
+using P_K_accounting.Service.HttpServices;
+using P_K_accounting.Service.UIServices;
 using System.Net;
 
 namespace P_K_accounting
@@ -6,9 +9,13 @@ namespace P_K_accounting
     public partial class CompanyService_Form : Form
     {
         private readonly CompanyFacilityService _companyService;
+        private readonly GridViewCompanyService _gridService;
+        private UIHelper _helper;
         public CompanyService_Form()
         {
             _companyService = new CompanyFacilityService(new HttpService_CompanyService());
+            _gridService = new GridViewCompanyService();
+            _helper = new UIHelper();
             InitializeComponent();
         }
 
@@ -58,19 +65,14 @@ namespace P_K_accounting
 
         }
 
-        private async void getServicesBtn_Click(object sender, EventArgs e)
-        {
-            await GetServices();
-        }
-
         private void addPanelBtn_Click(object sender, EventArgs e)
         {
-            TogglePanel(addingPanel, updatingPanel);
+            _helper.TogglePanels(addingPanel, updatingPanel);
         }
 
         private void updatePanelBtn_Click(object sender, EventArgs e)
         {
-            TogglePanel(updatingPanel, addingPanel);
+            _helper.TogglePanels(updatingPanel, addingPanel);
         }
 
         private void companyserviceTable_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -86,13 +88,6 @@ namespace P_K_accounting
             ServiceNameUpdateText.Text = row.Cells[1].Value.ToString();
         }
 
-        private void TogglePanel(Panel showPanel, Panel hidePanel)
-        {
-            showPanel.Visible = true;
-            hidePanel.Visible = false;
-            showPanel.Location = new Point(32, 75);
-        }
-
         private async Task GetServices()
         {
             var services = await _companyService.GetAllServices();
@@ -102,20 +97,34 @@ namespace P_K_accounting
         private async Task AddService(string serviceName)
         {
             HttpResponseMessage response = await _companyService.AddService(serviceName);
-            MessageBox.Show(response.IsSuccessStatusCode ? "Service successfully added" :
-            (response.StatusCode == HttpStatusCode.Conflict ? "Service already exist" : "Entered data is incorrect"), "Info", MessageBoxButtons.OK);
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                companyserviceTable.DataSource = await _gridService.AddRecordToGrid(response, companyserviceTable);
+                companyserviceTable.Refresh();
+            }
+            await _helper.GetDialogByResponse(response);
         }
 
         private async Task UpdateService(int id, string serviceName)
         {
             HttpResponseMessage response = await _companyService.UpdateServiceById(id, serviceName);
-            MessageBox.Show(response.IsSuccessStatusCode ? "Service successfully updated" : "Entered data is incorrect", "Info", MessageBoxButtons.OK);
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                companyserviceTable.DataSource = await _gridService.UpdateRecordInGrid(response, companyserviceTable);
+                companyserviceTable.Refresh();
+            }
+            await _helper.GetDialogByResponse(response);
         }
 
         private async Task DeleteService(int id)
         {
             HttpResponseMessage response = await _companyService.DeleteServiceById(id);
-            MessageBox.Show(response.IsSuccessStatusCode ? "Service deleted successfully" : "Service doesnt exist", "Info", MessageBoxButtons.OK);
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                companyserviceTable.DataSource = await _gridService.DeleteRecordFromGrid(id, companyserviceTable);
+                companyserviceTable.Refresh();
+            }
+            await _helper.GetDialogByResponse(response);
         }
      
     }

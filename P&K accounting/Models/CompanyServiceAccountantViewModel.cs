@@ -2,7 +2,7 @@
 
 namespace P_K_accounting.Models
 {
-    public class CompanyService
+    public class CompanyServiceAccountantViewModel
     {
         [JsonPropertyName("id")]
         public int ServiceId { get; set; }

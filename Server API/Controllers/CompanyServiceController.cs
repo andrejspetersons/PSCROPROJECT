@@ -1,6 +1,8 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using Server_API.Services.CompanyServices;
+using System.Net;
 
 namespace Server_API.Controllers
 {
@@ -20,18 +22,26 @@ namespace Server_API.Controllers
         public IActionResult AddService([FromBody]string serviceName)
         {
             var result = _serviceValidator.Validate(serviceName);
+            var resultUniq = _serviceValidator.Validate(serviceName, options => options.IncludeRuleSets("CheckDuplicates"));
             if (!result.IsValid)
             {
-                return BadRequest(serviceName);
+                Log.Error("Method {method} was called with" +
+                    "Result:{HttpStatusCode}." +
+                    "Serivce is invalid.\nErrors:\n{errors}",
+                    nameof(AddService),
+                    (int)HttpStatusCode.BadRequest,
+                    string.Join("\n", result.Errors.Select(error => error.ErrorMessage)));
+                return BadRequest(result.Errors.Select(error => error.ErrorMessage));
             }
-
-            if (_companyServices.AddService(serviceName))
-            {
-                return Ok();
+            else if (!resultUniq.IsValid) {
+                Log.Error("Method {method} was called with Result:{HttpStatusCode}.Service with name {name} already exist", nameof(AddService), (int)HttpStatusCode.Conflict, serviceName);              
+                return Conflict(resultUniq.Errors.Select(error=>error.ErrorMessage));
             }
             else
             {
-                return Conflict();
+                Log.Information("Method {method} was called with Result:{HttpStatusCode}", nameof(AddService), (int)HttpStatusCode.OK);
+                var service = _companyServices.AddService(serviceName);
+                return Ok(service);
             }
         }
 
@@ -40,17 +50,35 @@ namespace Server_API.Controllers
         public IActionResult UpdateServiceById(int id, [FromBody]string serviceName)
         {
             var result = _serviceValidator.Validate(serviceName);
+            var resultUniq = _serviceValidator.Validate(serviceName, options => options.IncludeRuleSets("CheckDuplicates"));
             if (!result.IsValid)
             {
-                return BadRequest(serviceName);
+                Log.Error("Method {method} was called with" +
+                    "Result:{HttpStatusCode}." +
+                    "Serivce is invalid.\nErrors:\n{errors}",
+                    nameof(UpdateServiceById),
+                    (int)HttpStatusCode.BadRequest,
+                    string.Join("\n", result.Errors.Select(error => error.ErrorMessage)));
+                return BadRequest(result.Errors.Select(error => error.ErrorMessage));
             }
-            if (_companyServices.UpdateServiceById(id,serviceName))
+            else if (!resultUniq.IsValid)
             {
-                return Ok();
+                Log.Error("Method {method} was called with Result:{HttpStatusCode}.Service with name {name} already exist", nameof(UpdateServiceById), (int)HttpStatusCode.Conflict, serviceName);
+                return Conflict(resultUniq.Errors.Select(error => error.ErrorMessage));
             }
             else
             {
-                return NotFound();
+                var service = _companyServices.UpdateServiceById(id, serviceName);
+                if (service == null)
+                {
+                    Log.Error("Method {method} was called with Result:{HttpStatusCode}.No service was found with id {id}", nameof(UpdateServiceById), (int)HttpStatusCode.NotFound, id);
+                    return NotFound();
+                }
+                else
+                {
+                    Log.Information("Method {method} was called with Result:{HttpStatusCode}", nameof(UpdateServiceById), (int)HttpStatusCode.OK);
+                    return Ok(service);
+                }
             }
         }
 
@@ -60,10 +88,12 @@ namespace Server_API.Controllers
         {
             if (_companyServices.DeleteServiceById(id))
             {
+                Log.Information("Method {method} was called with Result:{HttpStatusCode}", nameof(DeleteServiceById), (int)HttpStatusCode.OK);
                 return Ok();
             }
             else
             {
+                Log.Error("Method {method} was called with Result:{HttpStatusCode}.No service was found with id {id}", nameof(DeleteServiceById), (int)HttpStatusCode.NotFound, id);
                 return NotFound();
             }
         }
@@ -75,10 +105,12 @@ namespace Server_API.Controllers
             var result = _companyServices.GetAllServices();
             if (result.Count > 0)
             {
+                Log.Information("Method {method} was called with Result:{HttpStatusCode}", nameof(GetServices), (int)HttpStatusCode.OK);
                 return Ok(result);
             }
             else
             {
+                Log.Warning("Method {method} was called with Result:{HttpStatusCode}.No services where found", nameof(GetServices), HttpStatusCode.NoContent);
                 return NoContent();
             }
         }
@@ -90,10 +122,12 @@ namespace Server_API.Controllers
             var result = _companyServices.GetServiceNames();
             if (result.Count > 0)
             {
+                Log.Information("Method {method} was called with Result:{HttpStatusCode}", nameof(GetServiceNames), (int)HttpStatusCode.OK);
                 return Ok(result);
             }
             else
             {
+                Log.Warning("Method {method} was called with Result:{HttpStatusCode}.No services where found", nameof(GetServiceNames), HttpStatusCode.NoContent);
                 return NoContent();
             }
         }

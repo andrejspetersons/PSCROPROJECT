@@ -1,9 +1,10 @@
 ﻿using P_K_accounting.Models;
+using P_K_accounting.Service.HttpServices;
 using System.Net;
 using System.Text;
 using System.Text.Json;
 
-namespace P_K_accounting.Service
+namespace P_K_accounting.Service.EntityService
 {
     public class ClientService
     {
@@ -24,7 +25,7 @@ namespace P_K_accounting.Service
             response.EnsureSuccessStatusCode();
             string responseContent = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<List<ClientAccountantViewModel>>(responseContent);
-            
+
         }
 
         public async Task<HttpResponseMessage> AddClientAsync(ClientAddViewModel cavm)
@@ -38,7 +39,7 @@ namespace P_K_accounting.Service
         {
             string json = JsonSerializer.Serialize(cvm);
             StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
-            return await _clientService.UpdateClientAsync($"http://localhost:5239/client-api/update/{id}",content);
+            return await _clientService.UpdateClientAsync($"http://localhost:5239/client-api/update/{id}", content);
         }
 
         public async Task<HttpResponseMessage> DeleteClientAsync(int id)

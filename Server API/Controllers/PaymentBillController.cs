@@ -1,8 +1,11 @@
-﻿using FluentValidation;
+﻿using AutoMapper;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using Server_API.Models.WinFormsModels;
 using Server_API.Services.AccountantService;
 using Server_API.Services.UserService;
+using System.Net;
 
 namespace Server_API.Controllers
 {
@@ -11,19 +14,22 @@ namespace Server_API.Controllers
     {
         private readonly IUserService _userservice;
         private readonly IAccountantService _accountantservice;
-        private readonly IValidator<int>_receiptvalidator;
+        private readonly IValidator<string>_receiptvalidator;
         private readonly IValidator<PaymentBillAccountantViewModel> _paymentbillvalidator;
+        private readonly IMapper _mapper;
 
         public PaymentBillController(
             IUserService userservice,
             IAccountantService accountantservice,
-            IValidator<int> receiptvalidator,
-            IValidator<PaymentBillAccountantViewModel> paymentbillvalidator)
+            IValidator<string> receiptvalidator,
+            IValidator<PaymentBillAccountantViewModel> paymentbillvalidator,
+            IMapper mapper)
         {
             _userservice = userservice;
             _accountantservice = accountantservice;
             _receiptvalidator = receiptvalidator;
             _paymentbillvalidator = paymentbillvalidator;
+            _mapper = mapper;
         }
 
         [HttpPost]
@@ -33,17 +39,27 @@ namespace Server_API.Controllers
             var result = _paymentbillvalidator.Validate(pbv);
             if (!result.IsValid)
             {
-                return BadRequest();
+                Log.Error("Method {method} was called with" +
+                    "Result:{HttpStatusCode}." +
+                    "PaymentBill parameters is invalid.\nErrors:\n{errors}",
+                    nameof(AddPaymentBill),
+                    (int)HttpStatusCode.BadRequest,
+                    string.Join("\n", result.Errors.Select(error => error.ErrorMessage)));
+
+                return BadRequest(result.Errors.Select(error => error.ErrorMessage));
             }
             else
             {
-                if(_accountantservice.AddPaymentBill(username, pbv))
+                var paymentBill = _accountantservice.AddPaymentBill(username, pbv);
+                if(paymentBill==null)
                 {
-                    return Ok();
+                    Log.Warning("Method {method} was called with Result:{HttpStatusCode}.PaymentBill parameters not found", nameof(AddPaymentBill), HttpStatusCode.NoContent);
+                    return NotFound();
                 }
                 else
                 {
-                    return NotFound();
+                    Log.Information("Method {method} was called with Result:{HttpStatusCode}", nameof(AddPaymentBill), (int)HttpStatusCode.OK);
+                    return Ok(_mapper.Map<PaymentBillAccountantViewModel>(paymentBill));    
                 }
                  
             }
@@ -58,9 +74,11 @@ namespace Server_API.Controllers
 
             if (clientPaymentBills.Count > 0)
             {
+                Log.Information("Method {method} was called with Result:{HttpStatusCode}", nameof(GetPaymentBillsByClientLogin), (int)HttpStatusCode.OK);
                 return Ok(clientPaymentBills);
             }
 
+            Log.Warning("Method {method} was called with Result:{HttpStatusCode}.There is no bills for {Username}", nameof(GetPaymentBillsByClientLogin), HttpStatusCode.NoContent, username);
             return NoContent();
 
         }
@@ -72,37 +90,56 @@ namespace Server_API.Controllers
             var result = _paymentbillvalidator.Validate(pbv);
             if (!result.IsValid)
             {
-                return BadRequest();
+                Log.Error("Method {method} was called with" +
+                    "Result:{HttpStatusCode}." +
+                    "PaymentBill parameters is invalid.\nErrors:\n{errors}",
+                    nameof(UpdatePaymentBillById),
+                    (int)HttpStatusCode.BadRequest,
+                    string.Join("\n", result.Errors.Select(error => error.ErrorMessage)));
+
+                return BadRequest(result.Errors.Select(error => error.ErrorMessage));
             }
             else
             {
-                if (_accountantservice.UpdatePaymentBillById(id, pbv))
+                var updatedPaymentBill = _accountantservice.UpdatePaymentBillById(id, pbv);
+                if (updatedPaymentBill==null)
                 {
-                    return Ok();
+                    Log.Error("Method {method} was called with Result:{HttpStatusCode}.No bill was found with id {id}", nameof(UpdatePaymentBillById), (int)HttpStatusCode.NotFound, id);
+                    return NotFound();
                 }
                 else
                 {
-                    return NotFound();
+                    Log.Information("Method {method} was called with Result:{HttpStatusCode}", nameof(UpdatePaymentBillById), (int)HttpStatusCode.OK);
+                    return Ok(_mapper.Map<PaymentBillAccountantViewModel>(updatedPaymentBill));
                 }
             }
         }
 
         [HttpPut]
         [Route("updatereceipt/{id}")]
-        public IActionResult UpdateReceipt(int id,[FromBody]int receipt)
+        public IActionResult UpdateReceipt(int id,[FromBody]string receipt)
         {
             var result = _receiptvalidator.Validate(receipt);
             if (!result.IsValid)
             {
-                return BadRequest(receipt);    
+                Log.Error("Method {method} was called with" +
+                    "Result:{HttpStatusCode}." +
+                    "Receipt is invalid.\nErrors:\n{errors}",
+                    nameof(UpdateReceipt),
+                    (int)HttpStatusCode.BadRequest,
+                    string.Join("\n", result.Errors.Select(error => error.ErrorMessage)));
+
+                return BadRequest(result.Errors.Select(error => error.ErrorMessage));    
             }
 
             if (_userservice.UpdateReceipt(id,receipt))
             {
+                Log.Information("Method {method} was called with Result:{HttpStatusCode}", nameof(UpdateReceipt), (int)HttpStatusCode.OK);
                 return Ok();
             }
             else
             {
+                Log.Error("Method {method} was called with Result:{HttpStatusCode}.No receipt was found with id {id}", nameof(UpdateReceipt), (int)HttpStatusCode.NotFound, id);
                 return NotFound();
             }
             
@@ -114,10 +151,12 @@ namespace Server_API.Controllers
         {
             if (_accountantservice.DeletePaymnentBillById(id))
             {
+                Log.Information("Method {method} was called with Result:{HttpStatusCode}", nameof(DeletePaymentBillById), (int)HttpStatusCode.OK);
                 return Ok();
             }
             else
             {
+                Log.Error("Method {method} was called with Result:{HttpStatusCode}.No bill was found with id {id}", nameof(DeletePaymentBillById), (int)HttpStatusCode.NotFound, id);
                 return NotFound();
             }
         }

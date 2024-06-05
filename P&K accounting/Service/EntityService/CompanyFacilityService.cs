@@ -1,9 +1,10 @@
 ﻿using P_K_accounting.Models;
+using P_K_accounting.Service.HttpServices;
 using System.Net;
 using System.Text;
 using System.Text.Json;
 
-namespace P_K_accounting.Service
+namespace P_K_accounting.Service.EntityService
 {
     public class CompanyFacilityService
     {
@@ -13,27 +14,27 @@ namespace P_K_accounting.Service
             _companyService = companyService;
         }
 
-        public async Task<List<CompanyService>> GetAllServices()
+        public async Task<List<CompanyServiceAccountantViewModel>> GetAllServices()
         {
             HttpResponseMessage response = await _companyService.GetAllServices($"http://localhost:5239/service-api/services");
             if (response.StatusCode == HttpStatusCode.NoContent)
             {
-                return new List<CompanyService>();
+                return new List<CompanyServiceAccountantViewModel>();
             }
 
             response.EnsureSuccessStatusCode();
             string content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<List<CompanyService>>(content);
+            return JsonSerializer.Deserialize<List<CompanyServiceAccountantViewModel>>(content);
         }
 
-        public async Task<HttpResponseMessage>AddService(string serviceName)
+        public async Task<HttpResponseMessage> AddService(string serviceName)
         {
             string json = JsonSerializer.Serialize(serviceName);
             StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
             return await _companyService.AddNewService($"http://localhost:5239/service-api/add", content);
         }
 
-        public async Task<HttpResponseMessage> UpdateServiceById(int id,string serviceName)
+        public async Task<HttpResponseMessage> UpdateServiceById(int id, string serviceName)
         {
             string json = JsonSerializer.Serialize(serviceName);
             StringContent content = new StringContent(json, Encoding.UTF8, "application/json");

@@ -56,7 +56,6 @@
             clientLastNameText = new TextBox();
             clientFirstName = new Label();
             clientLastName = new Label();
-            getClientsBtn = new Button();
             ((System.ComponentModel.ISupportInitialize)clientsTable).BeginInit();
             updatingPanel.SuspendLayout();
             addingPanel.SuspendLayout();
@@ -67,6 +66,7 @@
             clientsTable.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             clientsTable.Location = new Point(354, 80);
             clientsTable.Name = "clientsTable";
+            clientsTable.ReadOnly = true;
             clientsTable.RowTemplate.Height = 25;
             clientsTable.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
             clientsTable.Size = new Size(700, 250);
@@ -87,7 +87,7 @@
             updatingPanel.Controls.Add(clientLastNameUpdateText);
             updatingPanel.Controls.Add(FirstName);
             updatingPanel.Controls.Add(LastName);
-            updatingPanel.Location = new Point(720, 77);
+            updatingPanel.Location = new Point(1148, 64);
             updatingPanel.Name = "updatingPanel";
             updatingPanel.Size = new Size(244, 369);
             updatingPanel.TabIndex = 20;
@@ -97,6 +97,7 @@
             // 
             clientIdUpdateText.Location = new Point(18, 52);
             clientIdUpdateText.Name = "clientIdUpdateText";
+            clientIdUpdateText.ReadOnly = true;
             clientIdUpdateText.Size = new Size(199, 23);
             clientIdUpdateText.TabIndex = 28;
             clientIdUpdateText.Text = "0";
@@ -348,23 +349,12 @@
             clientLastName.TabIndex = 12;
             clientLastName.Text = "LastName";
             // 
-            // getClientsBtn
-            // 
-            getClientsBtn.Location = new Point(354, 23);
-            getClientsBtn.Name = "getClientsBtn";
-            getClientsBtn.Size = new Size(199, 39);
-            getClientsBtn.TabIndex = 30;
-            getClientsBtn.Text = "GetClients";
-            getClientsBtn.UseVisualStyleBackColor = true;
-            getClientsBtn.Click += getClientsBtn_Click;
-            // 
             // Clients_Form
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.ActiveCaption;
             ClientSize = new Size(1503, 567);
-            Controls.Add(getClientsBtn);
             Controls.Add(addingPanel);
             Controls.Add(addPanelBtn);
             Controls.Add(updatePanelBtn);
@@ -412,6 +402,5 @@
         private TextBox clientLastNameText;
         private Label clientFirstName;
         private Label clientLastName;
-        private Button getClientsBtn;
     }
 }

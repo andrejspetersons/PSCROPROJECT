@@ -1,0 +1,2 @@
+2024-06-05 12:08:02.943 +03:00 [WRN] Method GetPaymentBillsByClientLogin was called with Result:"NoContent".There is no bills for ivan
+2024-06-05 12:08:32.498 +03:00 [WRN] Method GetPaymentBillsByClientLogin was called with Result:"NoContent".There is no bills for ivan

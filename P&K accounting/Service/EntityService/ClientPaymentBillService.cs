@@ -1,9 +1,10 @@
 ﻿using P_K_accounting.Models;
+using P_K_accounting.Service.HttpServices;
 using System.Net;
 using System.Text;
 using System.Text.Json;
 
-namespace P_K_accounting.Service
+namespace P_K_accounting.Service.EntityService
 {
     public class ClientPaymentBillService
     {
@@ -69,6 +70,5 @@ namespace P_K_accounting.Service
             return JsonSerializer.Deserialize<IEnumerable<PaymentBillAccountantViewModel>>(responseContent);
         }
 
-       //get service names
     }
 }

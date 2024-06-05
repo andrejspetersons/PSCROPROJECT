@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Serilog;
 using Server_API.Services.UserService;
+using System.Net;
 
 namespace Server_API.Controllers
 {
@@ -17,10 +19,12 @@ namespace Server_API.Controllers
         {
             if (_userservice.isLoggedIn(username))
             {
+                Log.Information("Method {method} was called with Result:{HttpStatusCode}", nameof(Login), (int)HttpStatusCode.OK);
                 return Ok();
             }
             else
             {
+                Log.Error("Method {method} was called with Result:{HttpStatusCode}.No client was found with username {username}", nameof(Login), (int)HttpStatusCode.NotFound, username);
                 return NotFound();
             }
         }

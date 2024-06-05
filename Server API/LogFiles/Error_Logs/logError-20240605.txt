@@ -1,0 +1,12 @@
+2024-06-05 12:07:13.669 +03:00 [ERR] Method AddClient was called with Result:409.Client parameters are not uniq.
+Duplicates:
+Login apet already exist
+2024-06-05 12:08:40.616 +03:00 [ERR] Method AddPaymentBill was called withResult:400.PaymentBill parameters is invalid.
+Errors:
+Issue Date must occured before the Due Date
+2024-06-05 12:08:50.042 +03:00 [ERR] Method AddPaymentBill was called withResult:400.PaymentBill parameters is invalid.
+Errors:
+Issue Date must occured before the Due Date
+2024-06-05 12:08:53.477 +03:00 [ERR] Method AddPaymentBill was called withResult:400.PaymentBill parameters is invalid.
+Errors:
+Issue Date must occured before the Due Date
